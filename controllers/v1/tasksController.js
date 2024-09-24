@@ -1,11 +1,16 @@
+const { taskQueues } = require("../../queues/taskQueues");
+
 const createTask = async (req, res) => {
-	const userID = req.body.userID
+	const { user_id } = req.body;
+
+	// TODO: add to redis queue
+	taskQueues.addTask(user_id);
 
 	res.status(200).send(
-		`${userID}-task received at ${Date.now()}`
-	)
+		`${user_id}-task received at ${Date.now()}\n`
+	);
 }
 
 module.exports = {
 	createTask,
-}
+};
