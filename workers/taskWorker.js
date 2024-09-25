@@ -1,10 +1,15 @@
 const { Worker } = require('bullmq');
 const { getRedisClient } = require('../utils/redis');
 const { RATE_LIMITS, rateLimiter } = require('../utils/rateLimiter');
+const logger = require('../utils/logger');
 
 // given function
 const task = async (user_id) => {
-	console.log(`${user_id}-task completed at-${Date.now()}`);
+	const message = `${user_id}-task completed at-${Date.now()}`;
+	console.log(message);
+
+	// logging
+	logger(message + '\n', 'task.log');
 };
 
 const createWorker = (queueName) => {
