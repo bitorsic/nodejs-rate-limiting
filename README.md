@@ -61,3 +61,29 @@ This project implements the following rate limiters:
 - **20 requests per minute**
 
 No requests are dropped; they are queued and processed accordingly.
+
+## Explanation
+
+The directory tree with explanation is as follows (including only the necessary files):
+
+```
+.
+├── controllers/
+│   └── v1/
+│       └── taskController.js - adding the task to queue upon hitting api
+├── queues/
+│   └── taskQueues.js - maintaining the queue for tasks for each user
+├── routes/
+│   └── v1/
+│       └── task.js - mounting the taskController to /api/v1/task
+├── utils/
+│   ├── logger.js - logging to the /logs/ directory
+│   ├── rateLimiter.js - logic for rate limiting
+│   └── redis.js - exporting redis client for use by other modules
+├── workers/
+│   └── taskWorker.js - logic for executing tasks in queue
+├── .env - environment variables for port and redis config
+├── app.js - code run by each cluster node
+├── config.js - default config for redis to be used by IORedis package
+└── index.js - entry point, creating cluster and nodes
+```
