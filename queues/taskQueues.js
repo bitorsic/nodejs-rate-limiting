@@ -1,19 +1,26 @@
-const Queue = require('bull');
-const { bull_config } = require('../config');
-const taskWorker = require('../workers/taskWorker');
+const { Queue } = require('bullmq');
+const { createWorker } = require('../workers/taskWorker');
+const { getRedisClient } = require('../utils/redis');
 
 // an object where key = user_id, value = instance of Bull
 const taskQueues = {};
 
 // method to enqueue a user's task
 taskQueues.addTask = async (user_id) => {
+	const connection = getRedisClient();
+
 	if (!taskQueues[user_id]) {
-		taskQueues[user_id] = new Queue(`tasks:${user_id}`, bull_config);
-		// attaching a processor
-		taskQueues[user_id].process(taskWorker);
+		const queueName = `tasks?${user_id}`;
+
+		taskQueues[user_id] = new Queue(queueName, {
+			// passing the redisClient object
+			connection,
+		});
+
+		createWorker(queueName);
 	}
 
-	taskQueues[user_id].add({ user_id });
+	await taskQueues[user_id].add('job_name', { user_id });
 }
 
 module.exports = {
